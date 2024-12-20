@@ -9,8 +9,8 @@ const AuthPage = () => {
   const [card, setCard] = useState<SignInFlow>('signIn');
 
   return (
-    <div className="h-full bg-red-500 flex items-center justify-center">
-      <div>
+    <div className="h-full flex items-center justify-center bg-blue-500">
+      <div className=" md:w-[420px]">
         {card === 'signIn' ? (
           <SignInCard setCard={setCard} />
         ) : (
