@@ -11,14 +11,29 @@ import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 interface SignInCardProps {
   setCard: (card: SignInFlow) => void;
 }
 
 const SignInCard = ({ setCard }: SignInCardProps) => {
+  const { signIn } = useAuthActions();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pending, setPending] = useState<boolean>(false);
+  const [error, setError] = useState('');
+
+  // const handleSignIn = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setPending(true);
+
+  //   signIn('github', {})
+  //     .catch((err) => setError(err))
+  //     .finally(() => setPending(false));
+  // };
 
   return (
     <Card>
@@ -30,18 +45,49 @@ const SignInCard = ({ setCard }: SignInCardProps) => {
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <form>
-          <div className="flex flex-col  w-full items-center gap-4">
-            <Input type="email" placeholder="Email" />
-            <Input type="password" placeholder="Password" />
-            <Button className="w-full" variant="default">
+          <div className="flex flex-col  w-full items-center gap-2">
+            <Input
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              type="email"
+              placeholder="Email"
+              disabled={pending}
+              required
+            />
+            <Input
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              type="password"
+              placeholder="Password"
+              disabled={pending}
+              required
+            />
+            <Button
+              onClick={(e) => {
+                // handleSignIn(e);
+              }}
+              className="w-full"
+              variant="default"
+              disabled={pending}
+            >
               Submit
             </Button>
           </div>
         </form>
         <Separator />
         <div className="flex flex-col gap-2">
-          <Button variant="outline">Continue with Google</Button>
-          <Button variant="outline">Continue with GitHub</Button>
+          <Button variant="outline" disabled={pending}>
+            <FcGoogle className="size-5" />
+            Continue with Google
+          </Button>
+          <Button
+            onClick={() => signIn('github')}
+            variant="outline"
+            disabled={pending}
+          >
+            <FaGithub />
+            Continue with GitHub
+          </Button>
           <div className="flex flex-col items-center text-sm">
             Don't have an account?{' '}
             <div

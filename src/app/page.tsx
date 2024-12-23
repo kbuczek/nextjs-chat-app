@@ -1,6 +1,15 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
 import AuthPage from '@/features/auth/components/AuthPage';
-import Image from 'next/image';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 export default function Home() {
-  return <AuthPage />;
+  const { signOut } = useAuthActions();
+  return (
+    <>
+      <div>user signed in</div>
+      <Button onClick={() => signOut()}>Sign out</Button>
+    </>
+  );
 }
