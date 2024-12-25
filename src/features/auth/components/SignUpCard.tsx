@@ -93,7 +93,7 @@ const SignUpCard = ({ setCard }: SignUpCardProps) => {
         <Separator />
         <div className="flex flex-col gap-2">
           <Button
-            onClick={() => onProviderSignIn('github')}
+            onClick={() => onProviderSignIn('google')}
             variant="outline"
             disabled={pending}
           >
