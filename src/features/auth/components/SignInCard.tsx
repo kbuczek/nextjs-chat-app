@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { SignInFlow } from '../types';
+import { ProvidersType, SignInFlow } from '../types';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@radix-ui/react-separator';
 import { Button } from '@/components/ui/button';
@@ -26,14 +26,20 @@ const SignInCard = ({ setCard }: SignInCardProps) => {
   const [pending, setPending] = useState<boolean>(false);
   const [error, setError] = useState('');
 
-  // const handleSignIn = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setPending(true);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  //   signIn('github', {})
-  //     .catch((err) => setError(err))
-  //     .finally(() => setPending(false));
-  // };
+    setPending(true);
+
+    signIn('signIn', { email, password, flow: 'signUp' })
+      .catch(() => setError('something went wrong'))
+      .finally(() => setPending(false));
+  };
+
+  const onProviderSignIn = (value: ProvidersType) => {
+    setPending(true);
+    signIn(value).finally(() => setPending(false));
+  };
 
   return (
     <Card>
@@ -44,7 +50,8 @@ const SignInCard = ({ setCard }: SignInCardProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        <form>
+        {!!error && <div className="bg-destructive/15">{error}</div>}
+        <form onSubmit={(e) => handleSubmit(e)}>
           <div className="flex flex-col  w-full items-center gap-2">
             <Input
               onChange={(e) => setEmail(e.target.value)}
@@ -62,26 +69,23 @@ const SignInCard = ({ setCard }: SignInCardProps) => {
               disabled={pending}
               required
             />
-            <Button
-              onClick={(e) => {
-                // handleSignIn(e);
-              }}
-              className="w-full"
-              variant="default"
-              disabled={pending}
-            >
+            <Button className="w-full" variant="default" disabled={pending}>
               Submit
             </Button>
           </div>
         </form>
         <Separator />
         <div className="flex flex-col gap-2">
-          <Button variant="outline" disabled={pending}>
+          <Button
+            onClick={() => onProviderSignIn('google')}
+            variant="outline"
+            disabled={pending}
+          >
             <FcGoogle className="size-5" />
             Continue with Google
           </Button>
           <Button
-            onClick={() => signIn('github')}
+            onClick={() => onProviderSignIn('github')}
             variant="outline"
             disabled={pending}
           >

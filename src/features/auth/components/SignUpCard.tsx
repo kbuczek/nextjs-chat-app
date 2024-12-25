@@ -7,20 +7,47 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { SignInFlow } from '../types';
+import { ProvidersType, SignInFlow } from '../types';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 interface SignUpCardProps {
   setCard: (card: SignInFlow) => void;
 }
 const SignUpCard = ({ setCard }: SignUpCardProps) => {
+  const { signIn } = useAuthActions();
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [pending, setPending] = useState<boolean>(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (password != confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+
+    setError('');
+
+    setPending(true);
+
+    // const formData = new FormData(e.currentTarget); doesn't work like that
+    signIn('password', { email, password, flow: 'signUp' })
+      .catch(() => setError('something went wrong'))
+      .finally(() => setPending(false));
+  };
+
+  const onProviderSignIn = (value: ProvidersType) => {
+    setPending(true);
+    signIn(value).finally(() => setPending(false));
+  };
 
   return (
     <Card>
@@ -31,7 +58,8 @@ const SignUpCard = ({ setCard }: SignUpCardProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <form>
+        {!!error && <div className="bg-destructive/15">{error}</div>}
+        <form onSubmit={(e) => handleSubmit(e)}>
           <div className="flex flex-col  w-full items-center gap-2">
             <Input
               onChange={(e) => setEmail(e.target.value)}
@@ -52,7 +80,7 @@ const SignUpCard = ({ setCard }: SignUpCardProps) => {
             <Input
               onChange={(e) => setConfirmPassword(e.target.value)}
               value={confirmPassword}
-              type="confirmPassword"
+              type="password"
               placeholder="Confirm password"
               disabled={pending}
               required
@@ -64,11 +92,19 @@ const SignUpCard = ({ setCard }: SignUpCardProps) => {
         </form>
         <Separator />
         <div className="flex flex-col gap-2">
-          <Button variant="outline" disabled={pending}>
+          <Button
+            onClick={() => onProviderSignIn('github')}
+            variant="outline"
+            disabled={pending}
+          >
             <FcGoogle className="size-5" />
             Continue with Google
           </Button>
-          <Button variant="outline" disabled={pending}>
+          <Button
+            onClick={() => onProviderSignIn('github')}
+            variant="outline"
+            disabled={pending}
+          >
             <FaGithub />
             Continue with GitHub
           </Button>
